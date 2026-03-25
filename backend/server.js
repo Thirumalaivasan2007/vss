@@ -158,12 +158,8 @@ app.post('/api/register', async (req, res) => {
     }
 });
 
-// Serve frontend HTML files for any non-API routes
-app.get('/*', (req, res) => {
-    // Check if the request is for an API route - if so, don't serve index.html (it should have been caught above)
-    if (req.path.startsWith('/api')) {
-        return res.status(404).json({ error: 'API route not found' });
-    }
+// Serve frontend HTML files for any non-API routes (Express 5 compatible regex)
+app.get(/^\/(?!api).*/, (req, res) => {
     res.sendFile(path.join(distPath, 'index.html'));
 });
 
