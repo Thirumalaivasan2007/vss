@@ -38,3 +38,7 @@
     "typescript-eslint": "^8.48.0"
   }
 }
+"scripts": {
+  "dev": "vite --host",
+  // ... other scripts
+}
