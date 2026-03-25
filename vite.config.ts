@@ -13,6 +13,7 @@ export default defineConfig({
   base: './',
   server: {
     port: 5173,
+    allowedHosts: ["vss-uby1.onrender.com"],
     proxy: {
       '/api': {
         target: 'http://localhost:5000',
