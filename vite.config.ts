@@ -13,7 +13,6 @@ export default defineConfig({
   base: './',
   server: {
     port: 5173,
-    allowedHosts: ["vss-uby1.onrender.com"],
     proxy: {
       '/api': {
         target: 'http://localhost:5000',
@@ -31,7 +30,11 @@ export default defineConfig({
     outDir: path.resolve(__dirname, 'dist'),
     emptyOutDir: true,
     rollupOptions: {
-      input: path.resolve(__dirname, 'frontend/index.html'),
+      input: {
+        main: path.resolve(__dirname, 'frontend/index.html'),
+        login: path.resolve(__dirname, 'frontend/login.html'),
+        attendance: path.resolve(__dirname, 'frontend/attendance.html'),
+      }
     }
   }
 })

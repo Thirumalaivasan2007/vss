@@ -16,6 +16,10 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
+// Serve static files from the 'dist' directory
+const distPath = path.join(__dirname, '../dist');
+app.use(express.static(distPath));
+
 // Connect to MongoDB
 const MONGO_URI = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/vss_dc';
 mongoose.connect(MONGO_URI, {
@@ -25,9 +29,9 @@ mongoose.connect(MONGO_URI, {
     .then(() => console.log('✅ Connected to MongoDB (' + MONGO_URI + ')'))
     .catch(err => console.error('MongoDB connection error:', err));
 
-// Test Home Route
-app.get('/', (req, res) => {
-    res.send('VSS DC Auth Server Running');
+// Test API Route
+app.get('/api/health', (req, res) => {
+    res.json({ status: 'ok', message: 'VSS DC Auth Server Running' });
 });
 
 // Login Endpoint
@@ -154,7 +158,16 @@ app.post('/api/register', async (req, res) => {
     }
 });
 
-const PORT = 5000;
-app.listen(PORT, () => {
-    console.log(`🚀 Server listening on http://localhost:${PORT}`);
+// Serve frontend HTML files for any non-API routes
+app.get('*', (req, res) => {
+    // Check if the request is for an API route - if so, don't serve index.html (it should have been caught above)
+    if (req.path.startsWith('/api')) {
+        return res.status(404).json({ error: 'API route not found' });
+    }
+    res.sendFile(path.join(distPath, 'index.html'));
+});
+
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, '0.0.0.0', () => {
+    console.log(`🚀 Server listening on http://0.0.0.0:${PORT}`);
 });
