@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "start": "node backend/server.js",
-    "dev": "vite",
+    "dev": "vite --host",
     "server": "node backend/server.js",
     "build": "npx vite build",
     "lint": "npx eslint .",
@@ -37,8 +37,4 @@
     "globals": "^16.5.0",
     "typescript-eslint": "^8.48.0"
   }
-}
-"scripts": {
-  "dev": "vite --host",
-  // ... other scripts
 }
