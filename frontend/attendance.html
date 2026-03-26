@@ -372,24 +372,52 @@
     </div>
 
     <script>
-        // --- Data Management ---
-        const STAFF_STORAGE_KEY = 'compacting_staff';
-        const ATT_STORAGE_KEY = 'compacting_attendance';
-
-        function getStaff() {
-            return JSON.parse(localStorage.getItem(STAFF_STORAGE_KEY) || '[]');
+        // --- API Data Management ---
+        async function fetchAPI(endpoint, options = {}) {
+            try {
+                const response = await fetch(`/api/${endpoint}`, options);
+                if (!response.ok) throw new Error(`API Error: ${response.statusText}`);
+                return await response.json();
+            } catch (error) {
+                console.error(`Fetch error for ${endpoint}:`, error);
+                return null;
+            }
         }
 
-        function saveStaff(staffList) {
-            localStorage.setItem(STAFF_STORAGE_KEY, JSON.stringify(staffList));
+        async function getStaff() {
+            const staff = await fetchAPI('staff');
+            return staff || [];
         }
 
-        function getAttendance() {
-            return JSON.parse(localStorage.getItem(ATT_STORAGE_KEY) || '{}');
+        async function saveStaffMember(worker) {
+            return await fetchAPI('staff', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(worker)
+            });
         }
 
-        function saveAttendance(data) {
-            localStorage.setItem(ATT_STORAGE_KEY, JSON.stringify(data));
+        async function deleteStaffMember(id) {
+            return await fetchAPI(`staff/${id}`, { method: 'DELETE' });
+        }
+
+        async function getAttendanceData(dateStr) {
+            // Fetch multiple if needed, but here we fetch by ID (date)
+            const data = await fetchAPI(`attendance/${dateStr}`);
+            // If it's a single record from the generic findOneAndUpdate, it might be an object or array
+            // Our generic GET /api/:collection returns an ARRAY
+            if (Array.isArray(data)) {
+                return data.find(d => d.id === dateStr) || { id: dateStr, date: dateStr, records: {} };
+            }
+            return { id: dateStr, date: dateStr, records: {} };
+        }
+
+        async function saveAttendanceData(dateStr, records) {
+            return await fetchAPI('attendance', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: dateStr, date: dateStr, records })
+            });
         }
 
         // --- Live Clock ---
@@ -406,7 +434,7 @@
         updateClock();
 
         // --- Add Staff ---
-        document.getElementById('btnAddStaff').addEventListener('click', () => {
+        document.getElementById('btnAddStaff').addEventListener('click', async () => {
             const nameInput = document.getElementById('workerName');
             const salaryInput = document.getElementById('workerSalary');
 
@@ -418,14 +446,13 @@
                 return;
             }
 
-            const staff = getStaff();
+            const staff = await getStaff();
             if (staff.some(s => s.name.toLowerCase() === name.toLowerCase())) {
                 alert("Worker already exists.");
                 return;
             }
 
-            staff.push({ id: Date.now().toString(), name, salary });
-            saveStaff(staff);
+            await saveStaffMember({ id: Date.now().toString(), name, salary });
 
             nameInput.value = '';
             salaryInput.value = '';
@@ -433,12 +460,9 @@
         });
 
         // --- Delete Staff ---
-        function deleteStaff(id) {
+        async function deleteStaff(id) {
             if (!confirm("Are you sure you want to remove this worker?")) return;
-
-            let staff = getStaff();
-            staff = staff.filter(s => s.id !== id);
-            saveStaff(staff);
+            await deleteStaffMember(id);
             renderTable();
         }
 
@@ -450,19 +474,19 @@
         dateInput.addEventListener('change', renderTable);
 
         // --- Render Table ---
-        function renderTable() {
+        async function renderTable() {
             const dateStr = dateInput.value;
             if (!dateStr) return;
 
             const tbody = document.getElementById('attendanceTableBody');
-            const staff = getStaff();
-            const allAtt = getAttendance();
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 20px;">Loading...</td></tr>';
 
-            // Ensure date object exists
-            if (!allAtt[dateStr]) {
-                allAtt[dateStr] = {};
-            }
-            const dayData = allAtt[dateStr];
+            const [staff, dayRecord] = await Promise.all([
+                getStaff(),
+                getAttendanceData(dateStr)
+            ]);
+
+            const dayData = dayRecord.records || {};
 
             tbody.innerHTML = '';
 
@@ -501,14 +525,10 @@
         }
 
         // --- Save Data ---
-        function saveDailyData() {
+        async function saveDailyData() {
             const dateStr = dateInput.value;
-            const staff = getStaff();
-            const allAtt = getAttendance();
-
-            if (!allAtt[dateStr]) {
-                allAtt[dateStr] = {};
-            }
+            const staff = await getStaff();
+            const records = {};
 
             staff.forEach(worker => {
                 const mChk = document.querySelector(`.chk-mrng[data-id="${worker.id}"]`);
@@ -517,7 +537,7 @@
 
                 if (mChk && eChk && advInp) {
                     const advVal = parseInt(advInp.value, 10);
-                    allAtt[dateStr][worker.id] = {
+                    records[worker.id] = {
                         morning: mChk.checked,
                         evening: eChk.checked,
                         advance: isNaN(advVal) ? 0 : advVal
@@ -525,7 +545,7 @@
                 }
             });
 
-            saveAttendance(allAtt);
+            await saveAttendanceData(dateStr, records);
         }
 
         // --- Work Report ---
@@ -546,10 +566,22 @@
             }
         });
 
-        function generateReport() {
-            const staff = getStaff();
-            const allAtt = getAttendance();
+        async function generateReport() {
             const container = document.getElementById('reportContainer');
+            container.innerHTML = '<p style="text-align:center; padding: 20px;">Generating report...</p>';
+
+            const [staff, allAttendanceArray] = await Promise.all([
+                getStaff(),
+                fetchAPI('attendance')
+            ]);
+
+            // Convert array to object for easier lookup by date
+            const allAtt = {};
+            if (Array.isArray(allAttendanceArray)) {
+                allAttendanceArray.forEach(day => {
+                    allAtt[day.id] = day.records || {};
+                });
+            }
 
             let html = '';
 
@@ -564,9 +596,8 @@
                 let totalEarned = 0;
                 let totalAdvance = 0;
 
-                let advanceDaysHtml = ''; // For the table inside report
+                let advanceDaysHtml = '';
 
-                // Iterate over all dates in storage
                 Object.keys(allAtt).sort().forEach(dateKey => {
                     const dailyRecord = allAtt[dateKey][worker.id];
                     if (!dailyRecord) return;
@@ -591,7 +622,6 @@
                     totalEarned += earnedToday;
                     totalAdvance += adv;
 
-                    // Log advance history strictly where advance > 0
                     if (adv > 0) {
                         const displayDate = new Date(dateKey).toLocaleDateString('en-GB');
                         advanceDaysHtml += `
@@ -658,7 +688,6 @@
 
         // Initial render
         renderTable();
-
     </script>
 </body>
 
