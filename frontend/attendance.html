@@ -579,7 +579,14 @@
             const allAtt = {};
             if (Array.isArray(allAttendanceArray)) {
                 allAttendanceArray.forEach(day => {
-                    allAtt[day.id] = day.records || {};
+                    // Normalize records to be an object (id -> data)
+                    let normalizedRecords = {};
+                    if (Array.isArray(day.records)) {
+                        day.records.forEach(r => { if (r.id) normalizedRecords[r.id] = r; });
+                    } else {
+                        normalizedRecords = day.records || {};
+                    }
+                    allAtt[day.id] = normalizedRecords;
                 });
             }
 
@@ -595,6 +602,7 @@
                 let totalHalf = 0;
                 let totalEarned = 0;
                 let totalAdvance = 0;
+                const workerSalary = parseFloat(worker.salary) || 0;
 
                 let advanceDaysHtml = '';
 
@@ -602,9 +610,9 @@
                     const dailyRecord = allAtt[dateKey][worker.id];
                     if (!dailyRecord) return;
 
-                    const hasMorning = dailyRecord.morning;
-                    const hasEvening = dailyRecord.evening;
-                    const adv = dailyRecord.advance || 0;
+                    const hasMorning = !!dailyRecord.morning;
+                    const hasEvening = !!dailyRecord.evening;
+                    const adv = parseFloat(dailyRecord.advance) || 0;
 
                     let workType = 'Absent';
                     let earnedToday = 0;
@@ -612,11 +620,11 @@
                     if (hasMorning && hasEvening) {
                         workType = 'Full Day';
                         totalFull++;
-                        earnedToday = worker.salary;
+                        earnedToday = workerSalary;
                     } else if (hasMorning || hasEvening) {
                         workType = 'Half Day';
                         totalHalf++;
-                        earnedToday = worker.salary / 2;
+                        earnedToday = workerSalary / 2;
                     }
 
                     totalEarned += earnedToday;
