@@ -158,9 +158,15 @@ app.post('/api/register', async (req, res) => {
     }
 });
 
+import fs from 'fs';
 // Serve frontend HTML files for any non-API routes (Express 5 compatible regex)
 app.get(/^\/(?!api).*/, (req, res) => {
-    res.sendFile(path.join(distPath, 'index.html'));
+    const indexPath = path.join(distPath, 'index.html');
+    if (fs.existsSync(indexPath)) {
+        res.sendFile(indexPath);
+    } else {
+        res.json({ message: 'VSS DC Backend API is running successfully' });
+    }
 });
 
 const PORT = process.env.PORT || 5000;
