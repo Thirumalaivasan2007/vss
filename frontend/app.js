@@ -385,7 +385,7 @@ function initReceivedCloth() {
   if (btnBack) btnBack.addEventListener('click', () => { document.querySelectorAll('.form-actions .btn-action').forEach(b => b.disabled = false); showReceivedList(); });
   if (searchInput) searchInput.addEventListener('input', renderReceivedTable);
 
-  loadFromFirestore(receivedCol, STORAGE_KEY).then(() => {
+  loadFromMongoDB('received', STORAGE_KEY).then(() => {
     renderReceivedTable();
     updateDashboardMetrics();
   });
