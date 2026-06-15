@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "https://vss-backend-render-url-placeholder.onrender.com/api/:path*"
+      "destination": "https://vss-backend-3x9k.onrender.com/api/:path*"
     }
   ]
 }
