@@ -420,6 +420,8 @@ function renderReceivedTable() {
     return s.includes(search);
   });
 
+  entries.sort((a, b) => parseInt(a.inwNo || 0, 10) - parseInt(b.inwNo || 0, 10));
+
   tbody.innerHTML = entries.length ? entries.map(e => `
     <tr data-id="${e.id}">
       <td>${e.inwNo}</td>
@@ -986,6 +988,8 @@ function renderDeliveryTable() {
     return s.includes(search);
   });
 
+  deliveries.sort((a, b) => parseInt(a.dcNo || 0, 10) - parseInt(b.dcNo || 0, 10));
+
   tbody.innerHTML = deliveries.length ? deliveries.map(d => `
     <tr data-id="${d.id}">
       <td>${d.dcNo}</td>
@@ -1513,6 +1517,8 @@ function renderInvoiceTable() {
     const s = `${i.invNo} ${i.partyName} ${i.dcNo || ''}`.toLowerCase();
     return s.includes(search);
   });
+
+  invoices.sort((a, b) => parseInt(a.invNo || 0, 10) - parseInt(b.invNo || 0, 10));
 
   tbody.innerHTML = invoices.length ? invoices.map(i => `
     <tr data-id="${i.id}">
