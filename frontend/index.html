@@ -635,83 +635,90 @@
               <div class="form-section form-header-section">
                 <h2 class="form-title">INWARD ENTRY</h2>
                 <div class="form-grid form-header-grid">
-                  <div class="form-row">
-                    <label>Date</label>
-                    <div class="input-with-icon">
-                      <input type="date" id="inwDate">
-                    </div>
-                  </div>
-                  <div class="form-row">
-                    <label>INW No</label>
-                    <input type="text" id="inwNo" readonly placeholder="Auto">
-                  </div>
-                  <div class="form-row">
-                    <label>Party Name *</label>
-                    <div class="input-with-btn">
-                      <div class="custom-select-wrapper" id="wrapper_partyName">
-                        <div class="custom-select">
-                          <div class="custom-select__trigger">
-                            <input type="text" class="custom-select-search" id="search_partyName"
-                              placeholder="Select Party" autocomplete="off">
-                            <input type="hidden" id="partyName">
-                            <div class="arrow"></div>
-                          </div>
-                          <div class="custom-options" id="options_partyName"></div>
-                        </div>
+                  <!-- Left Column -->
+                  <div style="display: flex; flex-direction: column; gap: 16px;">
+                    <div class="form-row">
+                      <label>Date</label>
+                      <div class="input-with-icon">
+                        <input type="date" id="inwDate">
                       </div>
-                      <button type="button" class="btn-secondary"
-                        onclick="navigateTo('party-master', true)">New</button>
                     </div>
-                  </div>
-                  <div class="form-row">
-                    <label>Type of Process</label>
-                    <div class="input-with-btn">
-                      <select id="typeOfProcess">
-                        <option value="COMPACTING" selected>COMPACTING</option>
-                        <option value="DYEING">DYEING</option>
-                        <option value="WASHING">WASHING</option>
-                        <option value="OTHER">OTHER</option>
-                      </select>
-                      <button type="button" class="btn-secondary">Process Change</button>
+                    <div class="form-row">
+                      <label>INW No</label>
+                      <input type="text" id="inwNo" readonly placeholder="Auto">
                     </div>
-                  </div>
-                  <div class="form-row">
-                    <label>Dyeing Name</label>
-                    <div class="input-with-btn">
-                      <div class="custom-select-wrapper" id="wrapper_dyeingName">
-                        <div class="custom-select">
-                          <div class="custom-select__trigger">
-                            <input type="text" class="custom-select-search" id="search_dyeingName"
-                              placeholder="Select Dyeing Unit" autocomplete="off">
-                            <input type="hidden" id="dyeingName">
-                            <div class="arrow"></div>
+                    <div class="form-row">
+                      <label>Party Name *</label>
+                      <div class="input-with-btn">
+                        <div class="custom-select-wrapper" id="wrapper_partyName">
+                          <div class="custom-select">
+                            <div class="custom-select__trigger">
+                              <input type="text" class="custom-select-search" id="search_partyName"
+                                placeholder="Select Party" autocomplete="off">
+                              <input type="hidden" id="partyName">
+                              <div class="arrow"></div>
+                            </div>
+                            <div class="custom-options" id="options_partyName"></div>
                           </div>
-                          <div class="custom-options" id="options_dyeingName"></div>
                         </div>
+                        <button type="button" class="btn-secondary"
+                          onclick="navigateTo('party-master', true)">New</button>
                       </div>
-                      <button type="button" class="btn-secondary"
-                        onclick="navigateTo('dyeing-master', true)">Add New Dyeing</button>
+                    </div>
+                    <div class="form-row">
+                      <label>Type of Process</label>
+                      <div class="input-with-btn">
+                        <select id="typeOfProcess">
+                          <option value="COMPACTING" selected>COMPACTING</option>
+                          <option value="DYEING">DYEING</option>
+                          <option value="WASHING">WASHING</option>
+                          <option value="OTHER">OTHER</option>
+                        </select>
+                        <button type="button" class="btn-secondary">Process Change</button>
+                      </div>
                     </div>
                   </div>
-                  <div class="form-row">
-                    <label>Dy. Dc No</label>
-                    <input type="text" id="dyDcNo" placeholder="">
-                  </div>
-                  <div class="form-row">
-                    <label>Lot/Batch No</label>
-                    <input type="text" id="lotNo" placeholder="">
-                  </div>
-                  <div class="form-row">
-                    <label>Party Dc No</label>
-                    <input type="text" id="partyDcNo" placeholder="">
-                  </div>
-                  <div class="form-row">
-                    <label>Party Order/Style No</label>
-                    <input type="text" id="partyOrder" placeholder="">
-                  </div>
-                  <div class="form-row form-row-full">
-                    <label>Remarks</label>
-                    <textarea id="remarks" rows="2" placeholder=""></textarea>
+
+                  <!-- Right Column -->
+                  <div style="display: flex; flex-direction: column; gap: 16px;">
+                    <div class="form-row">
+                      <label>Dyeing Name</label>
+                      <div class="input-with-btn">
+                        <div class="custom-select-wrapper" id="wrapper_dyeingName">
+                          <div class="custom-select">
+                            <div class="custom-select__trigger">
+                              <input type="text" class="custom-select-search" id="search_dyeingName"
+                                placeholder="Select Dyeing Unit" autocomplete="off">
+                              <input type="hidden" id="dyeingName">
+                              <div class="arrow"></div>
+                            </div>
+                            <div class="custom-options" id="options_dyeingName"></div>
+                          </div>
+                        </div>
+                        <button type="button" class="btn-secondary"
+                          onclick="navigateTo('dyeing-master', true)">Add New Dyeing</button>
+                      </div>
+                    </div>
+                    <div class="form-row">
+                      <label>Dy. Dc No</label>
+                      <input type="text" id="dyDcNo" placeholder="">
+                    </div>
+                    <div class="form-row">
+                      <label>Lot/Batch No</label>
+                      <input type="text" id="lotNo" placeholder="">
+                    </div>
+                    <div class="form-row">
+                      <label>Party Dc No</label>
+                      <input type="text" id="partyDcNo" placeholder="">
+                    </div>
+                    <div class="form-row">
+                      <label>Party Order/Style No</label>
+                      <input type="text" id="partyOrder" placeholder="">
+                    </div>
+                    <div class="form-row">
+                      <label>Remarks</label>
+                      <textarea id="remarks" rows="2" placeholder=""></textarea>
+                    </div>
                   </div>
                 </div>
               </div>
